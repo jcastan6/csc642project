@@ -30,7 +30,7 @@ import {
 const MyMapComponent = compose(
   withProps({
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAwx7ygt9FsbDQ2sMBkJoLANW8DURJxBOs&v=3.exp&libraries=geometry,drawing,places",
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAwx7ygt9FsbDQ2sMBkJoLANW8DURJxBOs&v=3&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
     mapElement: <div style={{ height: `100%` }} />,
@@ -50,29 +50,39 @@ class Results extends Component {
     super(props);
 
     this.handleRouteChange = this.handleRouteChange.bind(this);
-    this.state = this.props.location.state;
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.setState({
-      lat: 32.6325156,
-      lng: -116.9922555,
-    });
 
-    Geocode.fromAddress(
+    this.state = this.props.location.state;
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.changeAdress = this.changeAdress.bind(this);
+    this.changeAdress();
+  }
+
+  async changeAdress() {
+    const res = await Geocode.fromAddress(
       `${this.state.address} ${this.state.city} ${this.state.state} ${this.state.zip}`
-    ).then(
-      (response) => {
-        const res = response.results[0].geometry.location;
-        console.log(res);
-        this.setState({
-          lat: res.lat,
-          lng: res.lng,
-        }),
-          () => console.log();
-      },
-      (error) => {
-        console.error(error);
-      }
     );
+    const result = res.results[0].geometry.location;
+    this.setState({
+      lat: result.lat,
+      lng: result.lng,
+    }),
+      () => console.log();
+  }
+
+  renderMap() {
+    console.log(this.state);
+
+    if (this.state.lat !== undefined) {
+      return (
+        <MyMapComponent
+          isMarkerShown
+          lat={this.state.lat}
+          lng={this.state.lng}
+        />
+      );
+    }
   }
 
   componentDidMount() {
@@ -371,13 +381,7 @@ class Results extends Component {
                 </Form.Control.Feedback>
               </FormGroup>
             </Row>
-            <div style={{ width: "100%" }}>
-              <MyMapComponent
-                isMarkerShown
-                lat={this.state.lat}
-                lng={this.state.lng}
-              />
-            </div>
+            <div style={{ width: "100%" }}>{this.renderMap()}</div>
             <br />
             <Form.Label>
               <b>Select all services you require...</b>
