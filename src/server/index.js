@@ -21,7 +21,7 @@ app.use(cors());
 app.use(express.static("dist"));
 
 app.set("view engine", "ejs");
-app.listen(3001, () => console.log("Listening on port 4000!"));
+app.listen(3002, () => console.log("Listening on port 3002!"));
 
 app.use((err, req, res, next) => {
   // set locals, only providing error in development
